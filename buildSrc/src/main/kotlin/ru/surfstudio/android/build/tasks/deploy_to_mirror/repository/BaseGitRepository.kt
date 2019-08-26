@@ -181,8 +181,8 @@ abstract class BaseGitRepository {
     /**
      *
      */
-    fun isBranchExists(branchName: String):Boolean{
-        return  git.branchList().call()
+    fun isBranchExists(branchName: String): Boolean {
+        return git.branchList().call()
                 .map { it.name }
                 .extractBranchNames()
                 .contains(branchName)
@@ -226,15 +226,39 @@ abstract class BaseGitRepository {
     /**
      * create branch
      */
-    fun createBranch(branchName: String, startCommit: String){
+    fun createBranch(branchName: String, startCommit: String) {
         git.branchCreate().setForce(true).setName(branchName).setStartPoint(startCommit).call()
     }
 
     /**
      * delete branch
      */
-    fun deleteBranch(branchName: String){
+    fun deleteBranch(branchName: String) {
         git.branchDelete().setBranchNames(branchName).setForce(true).call()
+    }
+
+    /**
+     * Get diff from commit to current
+     */
+    fun diff(commit: String): List<String> {
+        val currentCommit = git.repository.resolve("HEAD^{tree}")
+        val oldCommit = git.repository.resolve("$commit^{tree}")
+
+        val reader = git.repository.newObjectReader()
+
+        val currentTree = CanonicalTreeParser().apply {
+            reset(reader, currentCommit)
+        }
+
+        val oldTree = CanonicalTreeParser().apply {
+            reset(reader, oldCommit)
+        }
+
+        return git.diff()
+                .setNewTree(currentTree)
+                .setOldTree(oldTree)
+                .call()
+                .map { it.oldPath }
     }
 
     /**

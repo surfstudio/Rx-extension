@@ -1,4 +1,5 @@
 import ru.surfstudio.android.build.Components
+import ru.surfstudio.android.build.DependencyConfigurator
 
 apply from: '../../buildSrc/config.gradle'
 apply plugin: 'com.android.application'
@@ -32,25 +33,29 @@ android {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
-    implementation "org.jetbrains.anko:anko-common:$ankoVersion"
-    implementation "androidx.appcompat:appcompat:$androidxVersion"
-    implementation "androidx.constraintlayout:constraintlayout:$constraintLayoutXVersion"
+    DependencyConfigurator.projectImplementation(project, "sample-dagger")
+    DependencyConfigurator.projectImplementation(project, "dagger-scope")
+    DependencyConfigurator.projectImplementation(project, "rxbus")
+    DependencyConfigurator.projectImplementation(project, "core-ui")
+    DependencyConfigurator.projectImplementation(project, "core-mvp")
+    DependencyConfigurator.projectImplementation(project, "rx-extension")
+    DependencyConfigurator.projectImplementation(project, "connection")
+    DependencyConfigurator.projectImplementation(project, "message-controller")
+    DependencyConfigurator.projectImplementation(project, "network")
+    DependencyConfigurator.projectImplementation(project, "activity-holder")
+    DependencyConfigurator.projectImplementation(project, "logger")
+    DependencyConfigurator.projectImplementation(project, "util-ktx")
+
+    DependencyConfigurator.implementation(project, "org.jetbrains.kotlin:kotlin-stdlib-jdk7")
+    DependencyConfigurator.implementation(project, "org.jetbrains.anko:anko-common")
+    DependencyConfigurator.implementation(project, "androidx.appcompat:appcompat")
+    DependencyConfigurator.implementation(project, "androidx.constraintlayout:constraintlayout")
+
+    DependencyConfigurator.projectAndroidTestImplementation(project, "sample-common")
 }
 
 task printTestInstrumentationRunnerName {
     doLast {
         println "$android.defaultConfig.testInstrumentationRunner"
-    }
-}
-
-//временное решение для разрешения конфликтов версий сторонних зависимостей
-configurations.all {
-    resolutionStrategy.eachDependency { details ->
-        libraryVersions.each { libName, version ->
-            if ("${details.requested.group}:${details.requested.name}" == libName) {
-                details.useVersion version
-            }
-        }
     }
 }

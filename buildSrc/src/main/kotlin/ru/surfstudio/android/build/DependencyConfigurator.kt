@@ -7,6 +7,12 @@ import ru.surfstudio.android.build.model.dependency.Dependency
 private const val LIBRARY_VERSIONS_KEY = "libraryVersions"
 private const val IMPLEMENTATION_DEP_TYPE = "implementation"
 private const val API_DEP_TYPE = "api"
+private const val KAPT_DEP_TYPE = "kapt"
+private const val TEST_IMPLEMENTATION_DEP_TYPE = "testImplementation"
+private const val ANDROID_TEST_IMPLEMENTATION_DEP_TYPE = "androidTestImplementation"
+private const val KAPT_TEST_DEP_TYPE = "kaptTest"
+private const val KAPT_ANDROID_TEST_DEP_TYPE = "kaptAndroidTest"
+private const val CLASSPATH_DEP_TYPE = "classpath"
 
 /**
  * Encapsulate working with gradle dependencies
@@ -45,11 +51,44 @@ object DependencyConfigurator {
      */
     @JvmStatic
     fun projectImplementation(project: Project, dependencyName: String) {
-        project.properties.get("")
         if (GradlePropertiesManager.isCurrentComponentAMirror() && !isProjectIncluded(project, dependencyName)) {
             addDependency(project, IMPLEMENTATION_DEP_TYPE, getDependencyArtifactoryName(dependencyName))
         } else {
             addDependency(project, IMPLEMENTATION_DEP_TYPE, project.rootProject.project(dependencyName))
+        }
+    }
+
+    /**
+     * Add dependency to project with "testImplementation"
+     * If current project is not mirror and dependency is not contained in current project then
+     * add in with artifactory name else add locally
+     *
+     * @param project - project
+     * @param dependencyName - dependency name
+     */
+    @JvmStatic
+    fun projectTestImplementation(project: Project, dependencyName: String) {
+        if (GradlePropertiesManager.isCurrentComponentAMirror() && !isProjectIncluded(project, dependencyName)) {
+            addDependency(project, TEST_IMPLEMENTATION_DEP_TYPE, getDependencyArtifactoryName(dependencyName))
+        } else {
+            addDependency(project, TEST_IMPLEMENTATION_DEP_TYPE, project.rootProject.project(dependencyName))
+        }
+    }
+
+    /**
+     * Add dependency to project with "androidTestImplementation"
+     * If current project is not mirror and dependency is not contained in current project then
+     * add in with artifactory name else add locally
+     *
+     * @param project - project
+     * @param dependencyName - dependency name
+     */
+    @JvmStatic
+    fun projectAndroidTestImplementation(project: Project, dependencyName: String) {
+        if (GradlePropertiesManager.isCurrentComponentAMirror() && !isProjectIncluded(project, dependencyName)) {
+            addDependency(project, ANDROID_TEST_IMPLEMENTATION_DEP_TYPE, getDependencyArtifactoryName(dependencyName))
+        } else {
+            addDependency(project, ANDROID_TEST_IMPLEMENTATION_DEP_TYPE, project.rootProject.project(dependencyName))
         }
     }
 
@@ -73,6 +112,72 @@ object DependencyConfigurator {
     @JvmStatic
     fun api(project: Project, dep: String) {
         addDependency(project, API_DEP_TYPE, getDependencyNameWithVersion(dep))
+    }
+
+    /**
+     * Add dependency to project with "kapt"
+     *
+     * @param project - project
+     * @param dep - dependency name
+     */
+    @JvmStatic
+    fun kapt(project: Project, dep: String) {
+        addDependency(project, KAPT_DEP_TYPE, getDependencyNameWithVersion(dep))
+    }
+
+    /**
+     * Add dependency to project with "testImplementation"
+     *
+     * @param project - project
+     * @param dep - dependency name
+     */
+    @JvmStatic
+    fun testImplementation(project: Project, dep: String) {
+        addDependency(project, TEST_IMPLEMENTATION_DEP_TYPE, getDependencyNameWithVersion(dep))
+    }
+
+    /**
+     * Add dependency to project with "kaptTest"
+     *
+     * @param project - project
+     * @param dep - dependency name
+     */
+    @JvmStatic
+    fun kaptTest(project: Project, dep: String) {
+        addDependency(project, KAPT_TEST_DEP_TYPE, getDependencyNameWithVersion(dep))
+    }
+
+    /**
+     * Add dependency to project with "kaptAndroidTest"
+     *
+     * @param project - project
+     * @param dep - dependency name
+     */
+    @JvmStatic
+    fun kaptAndroidTest(project: Project, dep: String) {
+        addDependency(project, KAPT_ANDROID_TEST_DEP_TYPE, getDependencyNameWithVersion(dep))
+    }
+
+    /**
+     * Add dependency to project with "androidTestImplementation"
+     *
+     * @param project - project
+     * @param dep - dependency name
+     */
+    @JvmStatic
+    fun androidTestImplementation(project: Project, dep: String) {
+        addDependency(project, ANDROID_TEST_IMPLEMENTATION_DEP_TYPE, getDependencyNameWithVersion(dep))
+    }
+
+    /**
+     * Add dependency to project with "classpath"
+     *
+     * @param project - project
+     * @param dep - dependency name
+     */
+    @JvmStatic
+    fun classpath(project: Project, dep: String) {
+        project.buildscript.dependencies.add(CLASSPATH_DEP_TYPE, getDependencyNameWithVersion(dep))
     }
 
     private fun addThirdPartyDependencies(project: Project, dependencies: List<Dependency>) {
